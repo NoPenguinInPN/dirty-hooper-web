@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dirty Hooper</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #14161b; color: #e8e8e8;
+        font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+      #unity-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; background: #14161b; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+      #loading h1 { margin: 0; font-size: 40px; letter-spacing: 2px; color: #ffe14d; }
+      #bar { width: 320px; height: 8px; border-radius: 4px; background: #2a2e37; overflow: hidden; }
+      #fill { width: 0; height: 100%; background: #ffe14d; transition: width .2s; }
+      #tip { font-size: 13px; color: #9aa0ab; text-align: center; line-height: 1.7; }
+      #mobile { display: none; position: fixed; inset: 0; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <h1>DIRTY HOOPER</h1>
+      <div id="bar"><div id="fill"></div></div>
+      <div id="tip">首次加载需要下载几十 MB，请稍候<br>需要键盘游玩 · 加载完点一下画面再操作</div>
+    </div>
+    <div id="mobile">这个游戏需要键盘，请用电脑打开。</div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        document.querySelector("#loading").style.display = "none";
+        document.querySelector("#mobile").style.display = "flex";
+      } else {
+        var buildUrl = "Build";
+        var config = {
+          arguments: [],
+          dataUrl: buildUrl + "/Web.data.unityweb",
+          frameworkUrl: buildUrl + "/Web.framework.js.unityweb",
+          codeUrl: buildUrl + "/Web.wasm.unityweb",
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: "DirtyHooper",
+          productName: "DirtyHooper",
+          productVersion: "1.0",
+          autoSyncPersistentDataPath: true,      // 存档（出战角色、技能配置、战绩）写进浏览器，下次打开还在
+          showBanner: function (msg, type) { if (type == "error") alert(msg); else console.warn(msg); }
+        };
+        // 玩的时候误按 Ctrl+W / Cmd+W 等会关页面：先弹“确定离开？”
+        var started = false;
+        window.addEventListener("beforeunload", function (e) { if (started) { e.preventDefault(); e.returnValue = ""; } });
+        canvas.addEventListener("pointerdown", function () { canvas.focus(); });
+        var script = document.createElement("script");
+        script.src = buildUrl + "/Web.loader.js";
+        script.onload = function () {
+          createUnityInstance(canvas, config, function (p) {
+            document.querySelector("#fill").style.width = (100 * p) + "%";
+          }).then(function () {
+            document.querySelector("#loading").style.display = "none";
+            started = true; canvas.focus();
+          }).catch(function (m) { alert(m); });
+        };
+        document.body.appendChild(script);
+      }
+    </script>
+  </body>
+</html>
