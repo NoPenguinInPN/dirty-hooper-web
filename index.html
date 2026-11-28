@@ -30,7 +30,7 @@
         document.querySelector("#loading").style.display = "none";
         document.querySelector("#mobile").style.display = "flex";
       } else {
-        var buildUrl = "Build/0.8.1";
+        var buildUrl = "Build/0.8.2";
         var config = {
           arguments: [],
           dataUrl: buildUrl + "/Web.data.unityweb",
@@ -39,7 +39,7 @@
           streamingAssetsUrl: "StreamingAssets",
           companyName: "DirtyHooper",
           productName: "DirtyHooper",
-          productVersion: "0.7.4",
+          productVersion: "0.8.2",
           autoSyncPersistentDataPath: true,      // 存档（出战角色、技能配置、战绩）写进浏览器，下次打开还在
           showBanner: function (msg, type) { if (type == "error") alert(msg); else console.warn(msg); }
         };
